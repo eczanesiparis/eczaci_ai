@@ -45,7 +45,7 @@ export function ChatInterface() {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/chat', { message: userMessage.content });
+            const response = await axios.post('https://eczaci-ai.onrender.com/api/chat', { message: userMessage.content });
             const assistantMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
