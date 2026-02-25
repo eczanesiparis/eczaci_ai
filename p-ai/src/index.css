@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+
+@layer base {
+  :root {
+    --background: #0f172a;
+    /* slate-900 */
+    --foreground: #f8fafc;
+    /* slate-50 */
+    --card: #1e293b;
+    /* slate-800 */
+    --card-foreground: #f8fafc;
+    --primary: #3b82f6;
+    /* blue-500 */
+    --primary-foreground: #ffffff;
+    --border: #334155;
+    /* slate-700 */
+    --input: #1e293b;
+    --ring: #3b82f6;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply antialiased min-h-screen font-sans;
+  }
+}
