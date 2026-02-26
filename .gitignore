@@ -16,7 +16,7 @@ venv.bak/
 # Project Specific
 prospektus_db/
 prospektus_db.zip
-!chunk_*.dat
+!db_part_*.dat
 
 # Frontend
 p-ai/node_modules/

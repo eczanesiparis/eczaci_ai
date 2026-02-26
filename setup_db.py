@@ -6,7 +6,7 @@ DB_DIR = 'prospektus_db'
 ZIP_NAME = 'prospektus_db.zip'
 
 if not os.path.exists(DB_DIR):
-    parts = sorted(glob.glob('chunk_*.dat'))
+    parts = sorted(glob.glob('db_part_*.dat'))
     if parts:
         print("Reassembling ZIP file from chunks...")
         with open(ZIP_NAME, 'wb') as outfile:
