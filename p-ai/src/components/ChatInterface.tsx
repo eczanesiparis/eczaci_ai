@@ -67,18 +67,18 @@ export function ChatInterface() {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-emerald-950 text-slate-50">
+        <div className="flex flex-col h-screen bg-slate-50 text-slate-800">
             {/* Header */}
-            <header className="flex items-center justify-between px-6 py-4 border-b border-emerald-900 bg-emerald-950/50 backdrop-blur-sm sticky top-0 z-10 w-full">
+            <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10 w-full shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400">
+                    <div className="p-2 bg-green-100 rounded-xl text-green-600">
                         <Pill size={24} />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                        <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
                             Eczacı AI
                         </h1>
-                        <p className="text-xs text-emerald-200/60">Eczane Asistanı</p>
+                        <p className="text-xs text-slate-500">Eczane Asistanı</p>
                     </div>
                 </div>
             </header>
@@ -96,30 +96,30 @@ export function ChatInterface() {
                         <div className={cn(
                             "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center border",
                             m.role === 'user'
-                                ? "bg-emerald-900 border-emerald-800 text-emerald-300"
-                                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                ? "bg-white border-2 border-[#1E9E3D] text-[#1E9E3D]"
+                                : "bg-[#1E9E3D] border-transparent text-white"
                         )}>
                             {m.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                         </div>
                         <div className={cn(
                             "px-4 py-3 rounded-2xl max-w-[85%] text-sm sm:text-base leading-relaxed whitespace-pre-wrap shadow-sm",
                             m.role === 'user'
-                                ? "bg-emerald-600/90 text-white rounded-tr-sm"
-                                : "bg-emerald-900/80 border border-emerald-800/50 text-slate-200 rounded-tl-sm"
+                                ? "bg-white border-2 border-[#1E9E3D] text-[#1E9E3D] rounded-tr-sm font-medium"
+                                : "bg-[#1E9E3D] border border-[#1E9E3D] text-white rounded-tl-sm"
                         )}>
                             {m.content}
 
                             {m.role === 'assistant' && m.sources && m.sources.length > 0 && (
-                                <div className="mt-3 pt-3 border-t border-emerald-800/50">
-                                    <p className="text-[10px] uppercase tracking-wider text-emerald-500/80 font-bold mb-2 flex items-center gap-1">
-                                        <div className="w-1 h-1 bg-emerald-500 rounded-full"></div>
+                                <div className="mt-3 pt-3 border-t border-white/20">
+                                    <p className="text-[10px] uppercase tracking-wider text-white/90 font-bold mb-2 flex items-center gap-1">
+                                        <div className="w-1 h-1 bg-white rounded-full"></div>
                                         Kaynaklar
                                     </p>
                                     <div className="flex flex-wrap gap-1.5">
                                         {m.sources.map((source, idx) => (
                                             <span
                                                 key={idx}
-                                                className="text-[10px] px-2 py-0.5 bg-emerald-800/50 text-emerald-200/80 rounded-md border border-emerald-700/30 truncate max-w-full"
+                                                className="text-[10px] px-2 py-0.5 bg-white/10 text-white rounded-md border border-white/20 truncate max-w-full"
                                                 title={source}
                                             >
                                                 {source}
@@ -133,11 +133,11 @@ export function ChatInterface() {
                 ))}
                 {isLoading && (
                     <div className="flex gap-4 w-full">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1E9E3D] border-transparent text-white flex items-center justify-center">
                             <Bot size={16} />
                         </div>
-                        <div className="px-5 py-4 rounded-2xl bg-emerald-900/80 border border-emerald-800/50 text-emerald-200/60 rounded-tl-sm flex items-center gap-2">
-                            <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                        <div className="px-5 py-4 rounded-2xl bg-[#1E9E3D] border border-[#1E9E3D] text-white rounded-tl-sm flex items-center gap-2 shadow-sm">
+                            <Loader2 className="w-4 h-4 animate-spin text-white" />
                             <span className="text-sm">Yanıt düşünülüyor...</span>
                         </div>
                     </div>
@@ -146,29 +146,29 @@ export function ChatInterface() {
             </div>
 
             {/* Input Form */}
-            <div className="p-4 bg-emerald-950 border-t border-emerald-900 mt-auto">
+            <div className="p-4 bg-white border-t border-slate-200 mt-auto">
                 <form
                     onSubmit={handleSubmit}
-                    className="max-w-4xl mx-auto relative flex items-center bg-emerald-900/50 rounded-2xl border border-emerald-800/50 focus-within:ring-2 focus-within:ring-emerald-500/50 focus-within:border-emerald-500/50 transition-all shadow-lg"
+                    className="max-w-4xl mx-auto relative flex items-center bg-white rounded-2xl border-2 border-slate-200 focus-within:ring-4 focus-within:ring-green-500/10 focus-within:border-green-500 transition-all shadow-sm"
                 >
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="İlaç hakkında ne öğrenmek istersiniz? (örn: Parol ne işe yarar?)"
-                        className="w-full bg-transparent border-none px-6 py-4 text-emerald-50 placeholder:text-emerald-500/70 focus:outline-none rounded-2xl"
+                        className="w-full bg-transparent border-none px-6 py-4 text-slate-800 placeholder:text-slate-400 focus:outline-none rounded-2xl"
                         disabled={isLoading}
                     />
                     <button
                         type="submit"
                         disabled={!input.trim() || isLoading}
-                        className="absolute right-2 p-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+                        className="absolute right-2 p-2.5 bg-[#1E9E3D] hover:bg-[#198533] text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
                         <Send size={18} className="translate-x-[-1px] group-hover:translate-x-0 group-hover:-translate-y-[1px] transition-transform" />
                     </button>
                 </form>
                 <div className="text-center mt-3">
-                    <p className="text-[11px] text-emerald-500/70">
+                    <p className="text-[11px] text-slate-400">
                         Eczacı AI, bilgilendirme amaçlıdır.
                     </p>
                 </div>

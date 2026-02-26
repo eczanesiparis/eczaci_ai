@@ -90,10 +90,19 @@ async def chat_endpoint(request: ChatRequest):
         print(f"User message received: {request.message}")
         response = ilac_chain.invoke({"question": request.message})
         
-        # Extract unique sources from metadata
+        # Extract unique sources from metadata while preserving relevance order
         sources = []
+        seen = set()
         if 'source_documents' in response:
-            sources = list(set([doc.metadata.get('source', 'Unknown') for doc in response['source_documents']]))
+            for doc in response['source_documents']:
+                src_raw = doc.metadata.get('source', 'Unknown')
+                if src_raw != 'Unknown':
+                    # Sadece dosya ismini al ve uzantıyı temizle (.txt, .pdf vs)
+                    src_clean = os.path.basename(src_raw).rsplit('.', 1)[0]
+                    # Listede yoksa ekle (böylece en alakalı olan ilk sırada kalır)
+                    if src_clean not in seen:
+                        seen.add(src_clean)
+                        sources.append(src_clean)
             
         print(f"Reply generated with {len(sources)} sources.")
         return ChatResponse(answer=response['answer'], sources=sources)
