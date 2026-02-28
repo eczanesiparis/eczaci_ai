@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Pill } from 'lucide-react';
+import { Send, Bot, User, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -15,7 +15,13 @@ interface Message {
     sources?: string[];
 }
 
-export function ChatInterface() {
+interface ChatProps {
+    isAdmin?: boolean;
+    username?: string;
+    onLogout?: () => void;
+}
+
+export function ChatInterface({ isAdmin, username = "Kullanıcı", onLogout }: ChatProps) {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -71,14 +77,37 @@ export function ChatInterface() {
             {/* Header */}
             <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10 w-full shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 rounded-xl text-green-600">
-                        <Pill size={24} />
-                    </div>
+                    <img src="/icon4.ico" alt="Eczacı AI" className="w-10 h-10 object-contain rounded-full shadow-sm" />
                     <div>
                         <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
                             Eczacı AI
                         </h1>
                         <p className="text-xs text-slate-500">Eczane Asistanı</p>
+                    </div>
+                </div>
+
+                {/* Profile Controls */}
+                <div className="flex items-center gap-4">
+                    <div className="hidden sm:flex flex-col items-end">
+                        <span className="text-sm font-semibold text-slate-800">{username}</span>
+                        <span className="text-[10px] uppercase font-bold text-green-600">{isAdmin ? 'Admin' : 'Kullanıcı'}</span>
+                    </div>
+                    <div className="relative group cursor-pointer">
+                        <div className="w-10 h-10 bg-slate-100 border border-slate-200 text-slate-600 rounded-full flex items-center justify-center font-bold shadow-sm">
+                            {username.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 overflow-hidden text-sm">
+                            <div className="p-3 border-b border-slate-100 sm:hidden">
+                                <p className="font-semibold text-slate-800">{username}</p>
+                                <p className="text-[10px] uppercase text-green-600 font-bold">{isAdmin ? 'Admin' : 'Kullanıcı'}</p>
+                            </div>
+                            <button
+                                onClick={onLogout}
+                                className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 font-medium transition-colors"
+                            >
+                                Çıkış Yap
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -109,7 +138,7 @@ export function ChatInterface() {
                         )}>
                             {m.content}
 
-                            {m.role === 'assistant' && m.sources && m.sources.length > 0 && (
+                            {isAdmin && m.role === 'assistant' && m.sources && m.sources.length > 0 && (
                                 <div className="mt-3 pt-3 border-t border-white/20">
                                     <p className="text-[10px] uppercase tracking-wider text-white/90 font-bold mb-2 flex items-center gap-1">
                                         <div className="w-1 h-1 bg-white rounded-full"></div>

@@ -80,6 +80,84 @@ class ChatResponse(BaseModel):
     sources: list[str] = []
 
 import traceback
+import sqlite3
+import hashlib
+import binascii
+
+# DB Init
+def init_db():
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            is_admin BOOLEAN NOT NULL DEFAULT 0
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+# Hash utility
+def hash_password(password: str) -> str:
+    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+    pwdhash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 100000)
+    pwdhash = binascii.hexlify(pwdhash)
+    return (salt + pwdhash).decode('ascii')
+
+def verify_password(stored_password: str, provided_password: str) -> bool:
+    salt = stored_password[:64]
+    stored_hash = stored_password[64:]
+    pwdhash = hashlib.pbkdf2_hmac('sha512', provided_password.encode('utf-8'), salt.encode('ascii'), 100000)
+    pwdhash = binascii.hexlify(pwdhash).decode('ascii')
+    return pwdhash == stored_hash
+
+init_db()
+
+class AuthRequest(BaseModel):
+    username: str
+    password: str
+
+class AuthResponse(BaseModel):
+    success: bool
+    message: str
+    is_admin: bool = False
+
+@app.post("/api/register", response_model=AuthResponse)
+async def register(request: AuthRequest):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE username=?", (request.username,))
+    if c.fetchone():
+        conn.close()
+        raise HTTPException(status_code=400, detail="Username already exists")
+    
+    # Otomatik ledurullah admin kaydı kuralı vs. gerekebilir ama direkt insert
+    is_admin = 1 if request.username == "ledurullah" else 0
+    hashed_pw = hash_password(request.password)
+    c.execute("INSERT INTO users (username, password_hash, is_admin) VALUES (?, ?, ?)", 
+              (request.username, hashed_pw, is_admin))
+    conn.commit()
+    conn.close()
+    return AuthResponse(success=True, message="Registration successful", is_admin=bool(is_admin))
+
+@app.post("/api/login", response_model=AuthResponse)
+async def login(request: AuthRequest):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute("SELECT password_hash, is_admin FROM users WHERE username=?", (request.username,))
+    user = c.fetchone()
+    conn.close()
+    
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+        
+    stored_password, is_admin = user
+    if not verify_password(stored_password, request.password):
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+        
+    return AuthResponse(success=True, message="Login successful", is_admin=bool(is_admin))
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
