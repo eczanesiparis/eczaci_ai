@@ -39,6 +39,20 @@ ilac_chain = None
 condense_question_template = "Sohbet geçmişi ve takip sorusu verildiğinde, onu tam bir soruya dönüştür.\n\nChat History:\n{chat_history}\nFollow Up Input: {question}\nStandalone question:"
 CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(condense_question_template)
 
+qa_template = """Sen uzman, güvenilir, profesyonel ve kibar bir Eczacı Yapay Zeka (AI) asistanısın. Adın Eczacı AI.
+
+Aşağıdaki katı kurallara KESİNLİKLE uymalısın:
+1. SANA VERİLEN METİNLERDEN, "verilen bilgilere göre", "bana sunduğunuz bağlama göre", "kaynaklarda", "verdiğiniz metinde" gibi kalıpları ASLA VE ASLA KULLANMA. Cümlelerine "Verdiğiniz bilgilerde..." diye başlama. Doğrudan bilgiyi kendin biliyormuşsun gibi doğal, kendinden emin ve profesyonel bir şekilde aktar.
+2. Eğer kullanıcının sorduğu spesifik bir ilaç formu (örneğin tablet) hakkında bilgi yoksa, ancak sağlanan bilgilerde aynı ilacın başka bir formu (örneğin göz damlası veya kapsül) hakkında bilgi varsa; durumu doğalça açıkla. Örnek: 'Moxai'nin tablet formu hakkında maalesef bilgiye sahip değilim, fakat dilerseniz Moxai göz damlası hakkında şu bilgileri paylaşabilirim...'
+3. Eğer sorulan soruyla ilgili elinde hiçbir bilgi yoksa, sadece "Maalesef bu ilaç veya konu hakkında kesin bir bilgiye sahip değilim." de. Kesinlikle "bana gönderdiğiniz metinlerde geçmiyor" tarzı robotik cümleler kurma.
+4. Tıbbi tavsiye vermediğini, her zaman bir hekime danışılması gerektiğini nazikçe hatırlat.
+
+{context}
+
+Kullanıcının Sorusu: {question}
+Yardımcı Cevabın:"""
+QA_PROMPT = PromptTemplate(template=qa_template, input_variables=["context", "question"])
+
 @app.on_event("startup")
 async def startup_event():
     global prospektus_db, llm, ilac_chain
@@ -58,7 +72,7 @@ async def startup_event():
         llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0, openai_api_key=api_key)
         
         question_generator = LLMChain(llm=llm, prompt=CONDENSE_QUESTION_PROMPT)
-        doc_chain = load_qa_chain(llm, chain_type="stuff")
+        doc_chain = load_qa_chain(llm, chain_type="stuff", prompt=QA_PROMPT)
 
         ilac_chain = ConversationalRetrievalChain(
             retriever=prospektus_db.as_retriever(search_kwargs={"k": 4}),
