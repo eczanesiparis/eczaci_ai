@@ -55,7 +55,7 @@ export function Auth({ onLoginSuccess }: AuthProps) {
                 <div className="p-8">
                     <div className="text-center mb-8">
                         <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent flex items-center justify-center gap-2">
-                            <img src="/icon4.ico" alt="Eczacı AI" className="w-8 h-8 rounded-full" />
+                            <img src="/icon4.ico" alt="Eczacı AI" className="w-8 h-8 object-contain" />
                             Eczacı AI
                         </h2>
                         <p className="text-slate-500 mt-2 text-sm">
@@ -74,7 +74,7 @@ export function Auth({ onLoginSuccess }: AuthProps) {
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder:text-slate-400"
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder:text-slate-400 text-slate-900"
                                     placeholder="Kullanıcı adınız"
                                     required
                                 />
@@ -91,7 +91,7 @@ export function Auth({ onLoginSuccess }: AuthProps) {
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder:text-slate-400"
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all placeholder:text-slate-400 text-slate-900"
                                     placeholder="Şifreniz"
                                     required
                                     minLength={6}

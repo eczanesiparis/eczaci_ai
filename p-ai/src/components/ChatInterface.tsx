@@ -77,7 +77,7 @@ export function ChatInterface({ isAdmin, username = "Kullanıcı", onLogout }: C
             {/* Header */}
             <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10 w-full shadow-sm">
                 <div className="flex items-center gap-3">
-                    <img src="/icon4.ico" alt="Eczacı AI" className="w-10 h-10 object-contain rounded-full shadow-sm" />
+                    <img src="/icon4.ico" alt="Eczacı AI" className="w-10 h-10 object-contain shadow-sm" />
                     <div>
                         <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
                             Eczacı AI
