@@ -41,23 +41,32 @@ if not os.path.exists(DB_DIR):
                     outfile.write(infile.read())
         
         print(f"DEBUG - Assembled ZIP size: {os.path.getsize(ZIP_NAME)} bytes", flush=True)
-        print("Extracting ZIP file...", flush=True)
+        print("Extracting ZIP file manually to handle Windows backslashes...", flush=True)
         os.makedirs(DB_DIR, exist_ok=True)
         with zipfile.ZipFile(ZIP_NAME, 'r') as zip_ref:
-            print(f"DEBUG - ZIP namelist preview: {zip_ref.namelist()[:5]}", flush=True)
-            zip_ref.extractall(DB_DIR) 
-        
-        print(f"DEBUG - DB_DIR contents directly after extract: {os.listdir(DB_DIR)}", flush=True)
-        
-        # İç içe klasör oluşmuşsa dosyaları dışarı çıkar
-        from pathlib import Path
-        for item in os.listdir(DB_DIR):
-            nested_path = os.path.join(DB_DIR, item)
-            if os.path.isdir(nested_path) and "prospektus" in item.lower():
-                print(f"Nested directory detected '{item}'. Moving files to the root of {DB_DIR}...", flush=True)
-                for sub_item in os.listdir(nested_path):
-                    shutil.move(os.path.join(nested_path, sub_item), DB_DIR)
-                os.rmdir(nested_path)
+            for zip_info in zip_ref.infolist():
+                # Windows'taki ters slaslari platform bagimsiz slash'e cevir
+                target_path = zip_info.filename.replace('\\', '/')
+                
+                # Sadece 'prospektus_db_full/' on ekini temizle, dogrudan DB_DIR icine at
+                if target_path.startswith('prospektus_db_full/'):
+                    target_path = target_path[len('prospektus_db_full/'):]
+                
+                # Eger temizlendikten sonra bosa dusmusse (klasorun kendisi) gec
+                if not target_path:
+                    continue
+
+                full_path = os.path.join(DB_DIR, target_path)
+                
+                # Eger bu bir klasorse, onu olustur
+                if zip_info.is_dir() or target_path.endswith('/'):
+                    os.makedirs(full_path, exist_ok=True)
+                    continue
+                
+                # Eger dosya ise, bulundugu klasoru once guvence altina al, sonra dosyayi yaz
+                os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                with open(full_path, 'wb') as outfile:
+                    outfile.write(zip_ref.read(zip_info.filename))
             
         print("Cleaning up ZIP...", flush=True)
         if os.path.exists(ZIP_NAME):
