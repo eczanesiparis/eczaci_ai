@@ -65,8 +65,12 @@ if not os.path.exists(DB_DIR):
                 
                 # Eger dosya ise, bulundugu klasoru once guvence altina al, sonra dosyayi yaz
                 os.makedirs(os.path.dirname(full_path), exist_ok=True)
-                with open(full_path, 'wb') as outfile:
-                    outfile.write(zip_ref.read(zip_info.filename))
+                
+                # OUT OF MEMORY (OOM) ÇÖZÜMÜ: 
+                # sunucunun (Render) RAM'i (512MB), dosyanın (830MB) boyutundan küçük olduğu için 
+                # file.read() ile tüm dosyayı RAM'e almak yerine parça parça akıtarak yazıyoruz!
+                with zip_ref.open(zip_info) as source, open(full_path, 'wb') as outfile:
+                    shutil.copyfileobj(source, outfile, length=1024*1024)  # 1 MB'lik parçalarla aktar
             
         print("Cleaning up ZIP...", flush=True)
         if os.path.exists(ZIP_NAME):
