@@ -18,6 +18,18 @@ if os.path.exists(DB_DIR):
 if not os.path.exists(DB_DIR):
     parts = sorted(glob.glob('db_part_*.dat'))
     if parts:
+        # GİT LFS KONTROLÜ: GitHub bu büyük dosyaları text pointer olarak indirmiş olabilir (yaklaşık 130 byte)
+        # Eğer ilk part 1 MB'dan küçükse, bu bir LFS pointer'ıdır ve asıl veri indirilmemiştir.
+        if os.path.getsize(parts[0]) < 1000 * 1024:
+            print("Uyarı: .dat dosyaları Git LFS pointer olarak inmiş. Asıl veriler indiriliyor...", flush=True)
+            import subprocess
+            try:
+                subprocess.run(["git", "lfs", "install"], check=True)
+                subprocess.run(["git", "lfs", "pull"], check=True)
+                print("Git LFS verileri başarıyla indirildi.", flush=True)
+            except Exception as e:
+                print(f"LFS indirme hatası: {e}. Lütfen Render.com ayarlarından Git LFS'i aktif edin.", flush=True)
+
         print("Reassembling ZIP file from chunks...", flush=True)
         with open(ZIP_NAME, 'wb') as outfile:
             for part in parts:
