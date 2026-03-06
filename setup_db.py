@@ -18,6 +18,10 @@ if os.path.exists(DB_DIR):
 if not os.path.exists(DB_DIR):
     parts = sorted(glob.glob('db_part_*.dat'))
     if parts:
+        print(f"DEBUG - Found parts: {parts}", flush=True)
+        for part in parts:
+            print(f"DEBUG - {part} size: {os.path.getsize(part)} bytes", flush=True)
+
         # GİT LFS KONTROLÜ: GitHub bu büyük dosyaları text pointer olarak indirmiş olabilir (yaklaşık 130 byte)
         # Eğer ilk part 1 MB'dan küçükse, bu bir LFS pointer'ıdır ve asıl veri indirilmemiştir.
         if os.path.getsize(parts[0]) < 1000 * 1024:
@@ -36,22 +40,36 @@ if not os.path.exists(DB_DIR):
                 with open(part, 'rb') as infile:
                     outfile.write(infile.read())
         
+        print(f"DEBUG - Assembled ZIP size: {os.path.getsize(ZIP_NAME)} bytes", flush=True)
         print("Extracting ZIP file...", flush=True)
         os.makedirs(DB_DIR, exist_ok=True)
         with zipfile.ZipFile(ZIP_NAME, 'r') as zip_ref:
+            print(f"DEBUG - ZIP namelist preview: {zip_ref.namelist()[:5]}", flush=True)
             zip_ref.extractall(DB_DIR) 
         
-        # İç içe klasör oluşmuşsa (prospektus_db/prospektus_db_full) dosyaları dışarı çıkar
-        nested_dir = os.path.join(DB_DIR, 'prospektus_db_full')
-        if os.path.exists(nested_dir):
-            print("Nested directory detected. Moving files to the root of prospektus_db...", flush=True)
-            for item in os.listdir(nested_dir):
-                shutil.move(os.path.join(nested_dir, item), DB_DIR)
-            os.rmdir(nested_dir)
+        print(f"DEBUG - DB_DIR contents directly after extract: {os.listdir(DB_DIR)}", flush=True)
+        
+        # İç içe klasör oluşmuşsa dosyaları dışarı çıkar
+        from pathlib import Path
+        for item in os.listdir(DB_DIR):
+            nested_path = os.path.join(DB_DIR, item)
+            if os.path.isdir(nested_path) and "prospektus" in item.lower():
+                print(f"Nested directory detected '{item}'. Moving files to the root of {DB_DIR}...", flush=True)
+                for sub_item in os.listdir(nested_path):
+                    shutil.move(os.path.join(nested_path, sub_item), DB_DIR)
+                os.rmdir(nested_path)
             
         print("Cleaning up ZIP...", flush=True)
         if os.path.exists(ZIP_NAME):
             os.remove(ZIP_NAME)
+        
+        # Final Verification
+        final_files = os.listdir(DB_DIR)
+        print(f"DEBUG - Final DB_DIR contents: {final_files}", flush=True)
+        db_file = os.path.join(DB_DIR, 'chroma.sqlite3')
+        if os.path.exists(db_file):
+            print(f"DEBUG - chroma.sqlite3 final size: {os.path.getsize(db_file)} bytes", flush=True)
+        
         print("Database successfully prepared.", flush=True)
     else:
         print("Warning: Database chunks not found! Make sure they were uploaded.", flush=True)
