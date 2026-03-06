@@ -18,6 +18,15 @@ if not os.path.exists(DB_DIR):
         os.makedirs(DB_DIR, exist_ok=True)
         with zipfile.ZipFile(ZIP_NAME, 'r') as zip_ref:
             zip_ref.extractall(DB_DIR) 
+        
+        # İç içe klasör oluşmuşsa (prospektus_db/prospektus_db_full) dosyaları dışarı çıkar
+        nested_dir = os.path.join(DB_DIR, 'prospektus_db_full')
+        if os.path.exists(nested_dir):
+            import shutil
+            print("Nested directory detected. Moving files to the root of prospektus_db...")
+            for item in os.listdir(nested_dir):
+                shutil.move(os.path.join(nested_dir, item), DB_DIR)
+            os.rmdir(nested_dir)
             
         print("Cleaning up ZIP...")
         os.remove(ZIP_NAME)
