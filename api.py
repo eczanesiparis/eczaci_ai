@@ -12,52 +12,6 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chains.llm import LLMChain
-import zipfile
-import shutil
-
-# --- Veritabanı Parçalarını Birleştirme ve Açma Fonksiyonu ---
-def check_and_reconstruct_db():
-    folder_name = 'prospektus_db_full'
-    zip_name = 'prospektus_db_full.zip'
-    
-    # Eğer klasör zaten varsa bir şey yapma
-    if os.path.exists(folder_name):
-        return
-        
-    print("Veritabanı klasörü bulunamadı, parçalar birleştiriliyor...")
-    
-    # 1. Parçaları birleştirerek .zip oluştur
-    try:
-        with open(zip_name, 'wb') as f_out:
-            file_number = 1
-            while True:
-                part_name = f"db_part_{file_number:03d}.dat"
-                if not os.path.exists(part_name):
-                    break
-                with open(part_name, 'rb') as f_in:
-                    f_out.write(f_in.read())
-                file_number += 1
-        
-        if file_number == 1:
-            print("HATA: Veritabanı parçaları (db_part_*.dat) bulunamadı!")
-            return
-
-        # 2. .zip dosyasını dışarı çıkar
-        with zipfile.ZipFile(zip_name, 'r') as zip_ref:
-            zip_ref.extractall('.')
-        
-        print(f"Veritabanı başarıyla yüklendi: {folder_name}")
-        
-        # 3. Geçici .zip dosyasını temizle (isteğe bağlı)
-        if os.path.exists(zip_name):
-            os.remove(zip_name)
-            
-    except Exception as e:
-        print(f"Veritabanı açılırken hata oluştu: {e}")
-
-# Uygulama başlamadan önce kontrol et
-check_and_reconstruct_db()
-
 
 # Load env variables
 load_dotenv()
@@ -109,7 +63,7 @@ async def startup_event():
     embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     
     try:
-        prospektus_db = Chroma(persist_directory='prospektus_db_full', embedding_function=embeddings)
+        prospektus_db = Chroma(persist_directory='prospektus_db', embedding_function=embeddings)
         print("Prospektüs DB loaded successfully.")
     except Exception as e:
         print(f"Error loading Prospektüs DB: {e}")
