@@ -13,6 +13,8 @@ from langchain.prompts import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chains.llm import LLMChain
 
+import setup_db  # <-- Bu satır veritabanının uvicorn başlamadan önce otomatik açılmasını garanti eder
+
 # Load env variables
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
